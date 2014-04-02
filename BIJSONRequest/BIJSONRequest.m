@@ -133,10 +133,9 @@
         // PADLogError(@"failed: no internet connection, %@", self);
         dispatch_async(dispatch_get_main_queue(), ^{
             if (callback) {
-#warning NSError 作るべき
                 NSHTTPURLResponse* httpUrlResponse;
                 id                 jsonObject;
-                NSError*           connectionError;
+                NSError*           connectionError = [NSError errorWithDomain:@"BIJSONRequest" code:-1 userInfo:@{NSLocalizedDescriptionKey: @"No internet connection"}];
                 NSError*           jsonError;
                 callback(httpUrlResponse, jsonObject, connectionError, jsonError);
             }
@@ -269,21 +268,21 @@
     NSString* charset = (NSString*)CFStringConvertEncodingToIANACharSetName(CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding));
     
     // We don't bother to check if post data contains the boundary, since it's pretty unlikely that it does.
-	CFUUIDRef uuid = CFUUIDCreate(nil);
-	NSString* uuidString = (__bridge_transfer NSString*)CFUUIDCreateString(nil, uuid);
-	CFRelease(uuid);
+    CFUUIDRef uuid = CFUUIDCreate(nil);
+    NSString* uuidString = (__bridge_transfer NSString*)CFUUIDCreateString(nil, uuid);
+    CFRelease(uuid);
     
-	NSString* stringBoundary = [NSString stringWithFormat:@"0xHxRnCeQyVzSqKCwUEe-%@", uuidString];
-	
+    NSString* stringBoundary = [NSString stringWithFormat:@"0xHxRnCeQyVzSqKCwUEe-%@", uuidString];
+
     [request addValue:[NSString stringWithFormat:@"multipart/form-data; charset=%@; boundary=%@", charset, stringBoundary] forHTTPHeaderField:@"Content-Type"];
-	
+
     NSMutableString* postString = [NSMutableString string];
     
-	[postString appendString:[NSString stringWithFormat:@"--%@\r\n", stringBoundary]];
-	
-	// Adds post data
-	NSString* endItemBoundary = [NSString stringWithFormat:@"\r\n--%@\r\n", stringBoundary];
-	__block NSUInteger i=0;
+    [postString appendString:[NSString stringWithFormat:@"--%@\r\n", stringBoundary]];
+
+    // Adds post data
+    NSString* endItemBoundary = [NSString stringWithFormat:@"\r\n--%@\r\n", stringBoundary];
+    __block NSUInteger i=0;
     NSUInteger count = parameters.count;
     [parameters enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL* stop) {
         if ([key isKindOfClass:[NSString class]] == NO) {
@@ -293,14 +292,14 @@
             obj = [obj stringValue];
         }
         [postString appendString:[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"%@\"\r\n\r\n", key]];
-		[postString appendString:obj];
-		i++;
-		if (i != count) { // Only add the boundary if this is not the last item in the post body
-			[postString appendString:endItemBoundary];
-		}
+        [postString appendString:obj];
+        i++;
+        if (i != count) { // Only add the boundary if this is not the last item in the post body
+            [postString appendString:endItemBoundary];
+        }
     }];
-	
-	[postString appendString:[NSString stringWithFormat:@"\r\n--%@--\r\n", stringBoundary]];
+    
+    [postString appendString:[NSString stringWithFormat:@"\r\n--%@--\r\n", stringBoundary]];
     
     // PADLog(@"params: %@", postString);
     
