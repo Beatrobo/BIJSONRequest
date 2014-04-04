@@ -1,6 +1,7 @@
 #import "BIJSONRequest.h"
 #import "BIReachability.h"
 #import "NSURLConnection+bi_sendAsynchronousRequestOnMainThread.h"
+#import "BIJSONRequestLog.h"
 
 
 @interface BIJSONRequest ()
@@ -130,7 +131,7 @@
 {
     // Check network connection
     if ([BIReachability isInternetConnectionAvailable] == NO) {
-        // PADLogError(@"failed: no internet connection, %@", self);
+        BIJRLogError(@"failed: no internet connection, %@", self);
         dispatch_async(dispatch_get_main_queue(), ^{
             if (callback) {
                 NSHTTPURLResponse* httpUrlResponse;
@@ -171,6 +172,8 @@
                                           jsonObject = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
                                           jsonObject = [[self class] objectForRemoveNullObjects:jsonObject];
                                       }
+                                      
+                                      BIJRLogTrace(@"\n httpUrlResponse: %@\n jsonObject: %@\n connectionError: %@\n jsonError: %@", httpUrlResponse, jsonObject, connectionError, jsonError);
                                       
                                       if (callback) {
                                           callback(httpUrlResponse, jsonObject, connectionError, jsonError);
@@ -260,6 +263,9 @@
         }
         [getParameterString deleteCharactersInRange:NSMakeRange(getParameterString.length - 1, 1)];
     }
+    
+    BIJRLogDebug(@"getParameterString: %@", getParameterString);
+    
     return getParameterString;
 }
 
@@ -301,7 +307,7 @@
     
     [postString appendString:[NSString stringWithFormat:@"\r\n--%@--\r\n", stringBoundary]];
     
-    // PADLog(@"params: %@", postString);
+    BIJRLogDebug(@"params: %@", postString);
     
     request.HTTPBody = [postString dataUsingEncoding:NSUTF8StringEncoding];
 }
