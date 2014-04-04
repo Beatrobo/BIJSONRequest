@@ -1,7 +1,16 @@
 BIJSONRequest
 =================
-
-BI は Beatrobo Inc から取ってる。  
-他で使いたいことが増えてきたので元々 Beatrobo から取って使って Beatplug に移植して更に PlugAir に移植したものを、更に抽象化して抽出したやつ。  
   
-BIReachability に依存してる。  
+### Dependency  
+`BILogManager`  
+`BIReachability`  
+  
+### Require Framework  
+無し  
+  
+* * *
+  
+BI は Beatrobo Inc から取ってる。  
+NSURLConnection + NSOperationQueue の JSON 取得 & パーサー。Blocks ベース。  
+  
+Beatrobo で使ってたものを Beatplug に移植して更に PlugAir に移植したものを、更に抽象化して抽出したやつ。  
