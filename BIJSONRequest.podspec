@@ -1,10 +1,10 @@
 Pod::Spec.new do |s|
   s.name                  = "BIJSONRequest"
-  s.version               = "0.3"
+  s.version               = "1.0"
   s.summary               = "NSURLConnection + NSOperationQueue の JSON 取得 & パーサー。Blocks ベース。"
   s.author                = { "Yusuke SUGAMIYA" => "yusuke.dnpp@gmail.com" }
   s.homepage              = "https://github.com/Beatrobo/BIJSONRequest"
-  s.source                = { :git => "git@github.com:Beatrobo/BIJSONRequest.git", :tag => "0.3" }
+  s.source                = { :git => "git@github.com:Beatrobo/BIJSONRequest.git", :tag => "#{s.version}" }
   s.source_files          = 'BIJSONRequest/**/*.{h,m}'
   s.ios.source_files      = 'BIJSONRequest/**/*.{h,m}'
   s.osx.source_files      = 'BIJSONRequest/**/*.{h,m}'
