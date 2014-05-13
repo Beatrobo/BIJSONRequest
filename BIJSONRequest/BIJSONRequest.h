@@ -18,6 +18,8 @@ typedef NS_ENUM(NSUInteger, BIHTTPRequestMethod) {
 @property (nonatomic, readonly) NSDictionary*       parameters;
 - (instancetype)initWithURLString:(NSString*)urlString method:(BIHTTPRequestMethod)method parameters:(NSDictionary*)parameters;
 
+@property (nonatomic, readonly) NSMutableURLRequest* urlRequest;
+
 @property (nonatomic, readwrite) BOOL feedbackNetworkActivityIndicator; // Default is YES. flag for networkActivityIndicator (only iOS)
 
 - (void)sendJSONRequestWithCallback:(BIJSONRequestCallback)callback;

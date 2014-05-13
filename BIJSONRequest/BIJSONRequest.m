@@ -26,6 +26,8 @@
         _method     = method;
         _parameters = parameters.copy;
         
+        _urlRequest = [[self class] URLRequestForURLString:urlString method:method parameters:parameters];
+        
         _feedbackNetworkActivityIndicator = YES;
     }
     return self;
@@ -144,12 +146,10 @@
         return;
     }
     
-    NSMutableURLRequest* request = [[self class] URLRequestForURLString:_urlString method:_method parameters:_parameters];
-    
     if (self.feedbackNetworkActivityIndicator) {
         [BIReachability beginNetworkConnection];
     }
-    [NSURLConnection bi_sendAsynchronousRequest:request
+    [NSURLConnection bi_sendAsynchronousRequest:_urlRequest
                                           queue:[[self class] requestQueue]
                               completionHandler:^(NSURLResponse* urlResponse, NSData* data, NSError* connectionError) {
                                   NSHTTPURLResponse* httpUrlResponse = nil;
