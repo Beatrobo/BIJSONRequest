@@ -1,6 +1,6 @@
 #import <Foundation/Foundation.h>
 
-
+typedef void (^BIHTTPRequestCallback)(NSHTTPURLResponse* httpUrlResponse, NSData* body, NSError* connectionError);
 typedef void (^BIJSONRequestCallback)(NSHTTPURLResponse* httpUrlResponse, id json, NSError* connectionError, NSError* jsonError);
 
 typedef NS_ENUM(NSUInteger, BIHTTPRequestMethod) {
@@ -22,6 +22,7 @@ typedef NS_ENUM(NSUInteger, BIHTTPRequestMethod) {
 
 @property (nonatomic, readwrite) BOOL feedbackNetworkActivityIndicator; // Default is YES. flag for networkActivityIndicator (only iOS)
 
+- (void)sendHTTPRequestWithCallback:(BIHTTPRequestCallback)callback;
 - (void)sendJSONRequestWithCallback:(BIJSONRequestCallback)callback;
 
 + (NSString*)HTTPMethodStringForRequestMethod:(BIHTTPRequestMethod)method;

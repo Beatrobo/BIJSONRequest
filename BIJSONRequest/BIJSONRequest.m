@@ -129,7 +129,7 @@
 
 #pragma mark - Request
 
-- (void)sendJSONRequestWithCallback:(BIJSONRequestCallback)callback
+- (void)sendURLRequestWithCallback:(void (^)(NSHTTPURLResponse* httpUrlResponse, NSData* data, NSError* connectionError))callback // Private
 {
     // Check network connection
     if ([BIReachability isInternetConnectionAvailable] == NO) {
@@ -139,16 +139,17 @@
                 NSHTTPURLResponse* httpUrlResponse;
                 id                 jsonObject;
                 NSError*           connectionError = [NSError errorWithDomain:@"BIJSONRequest" code:-1 userInfo:@{NSLocalizedDescriptionKey: @"No internet connection"}];
-                NSError*           jsonError;
-                callback(httpUrlResponse, jsonObject, connectionError, jsonError);
+                callback(httpUrlResponse, jsonObject, connectionError);
             }
         });
         return;
     }
     
-    if (self.feedbackNetworkActivityIndicator) {
-        [BIReachability beginNetworkConnection];
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.feedbackNetworkActivityIndicator) {
+            [BIReachability beginNetworkConnection];
+        }
+    });
     [NSURLConnection bi_sendAsynchronousRequest:_urlRequest
                                           queue:[[self class] requestQueue]
                               completionHandler:^(NSURLResponse* urlResponse, NSData* data, NSError* connectionError) {
@@ -157,30 +158,44 @@
                                       httpUrlResponse = (NSHTTPURLResponse*)urlResponse;
                                   } else {
                                       if (!connectionError) {
-                                          connectionError = [NSError errorWithDomain:@"BIJSONRequest" code:-1 userInfo:@{NSLocalizedDescriptionKey: @"NSURLConnection connection error"}];
+                                          connectionError = [NSError errorWithDomain:@"BIJSONRequest" code:-1 userInfo:@{NSLocalizedDescriptionKey: @"URLResponse is not HTTPResponse"}];
                                       }
                                   }
                                   dispatch_async(dispatch_get_main_queue(), ^{
-                                      
                                       if (self.feedbackNetworkActivityIndicator) {
                                           [BIReachability endNetworkConnection];
                                       }
-                                      
-                                      NSError* jsonError = nil;
-                                      id jsonObject = nil;
-                                      if (data) {
-                                          jsonObject = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
-                                          jsonObject = [[self class] objectForRemoveNullObjects:jsonObject];
-                                      }
-                                      
-                                      BIJRLogTrace(@"\n httpUrlResponse: %@\n jsonObject: %@\n connectionError: %@\n jsonError: %@", httpUrlResponse, jsonObject, connectionError, jsonError);
-                                      
                                       if (callback) {
-                                          callback(httpUrlResponse, jsonObject, connectionError, jsonError);
+                                          callback(httpUrlResponse, data, connectionError);
                                       }
                                   });
                               }];
+}
 
+- (void)sendHTTPRequestWithCallback:(BIHTTPRequestCallback)callback
+{
+    [self sendURLRequestWithCallback:^(NSHTTPURLResponse* httpUrlResponse, NSData* data, NSError* connectionError) {
+        BIJRLogTrace(@"\n httpUrlResponse: %@\n body: %@\n connectionError: %@", httpUrlResponse, data, connectionError);
+        if (callback) {
+            callback(httpUrlResponse, data, connectionError);
+        }
+    }];
+}
+
+- (void)sendJSONRequestWithCallback:(BIJSONRequestCallback)callback
+{
+    [self sendURLRequestWithCallback:^(NSHTTPURLResponse* httpUrlResponse, NSData* data, NSError* connectionError) {
+        NSError* jsonError = nil;
+        id jsonObject = nil;
+        if (data) {
+            jsonObject = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
+            jsonObject = [[self class] objectForRemoveNullObjects:jsonObject];
+        }
+        BIJRLogTrace(@"\n httpUrlResponse: %@\n jsonObject: %@\n connectionError: %@\n jsonError: %@", httpUrlResponse, jsonObject, connectionError, jsonError);
+        if (callback) {
+            callback(httpUrlResponse, jsonObject, connectionError, jsonError);
+        }
+    }];
 }
 
 #pragma mark - public class method
