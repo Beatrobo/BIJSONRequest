@@ -244,7 +244,7 @@
 + (NSMutableURLRequest*)URLRequestForURLString:(NSString*)URLString method:(BIHTTPRequestMethod)method parameters:(NSDictionary*)parameters
 {
     NSMutableString* urlString = URLString.mutableCopy;
-    if (method == BIHTTPRequestMethodGET && parameters.allKeys.count > 0) {
+    if ((method == BIHTTPRequestMethodGET || method == BIHTTPRequestMethodDELETE) && parameters.allKeys.count > 0) {
         [urlString appendString:[self buildGetParameterStringWithDictionary:parameters]];
     }
     
@@ -254,7 +254,7 @@
     [request addValue:@"application/json" forHTTPHeaderField:@"Accept"];
     request.HTTPMethod = [self HTTPMethodStringForRequestMethod:method];
     
-    if (method == BIHTTPRequestMethodPOST || method == BIHTTPRequestMethodPUT || method == BIHTTPRequestMethodDELETE) {
+    if (method == BIHTTPRequestMethodPOST || method == BIHTTPRequestMethodPUT) {
         if (parameters) {
             [self buildPostBodyForRequest:request parameters:parameters];
         }
