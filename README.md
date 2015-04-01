@@ -6,11 +6,12 @@ BIJSONRequest
 `BIReachability`  
   
 ### Require Framework  
-無し  
+None  
   
 * * *
   
-BI は Beatrobo Inc から取ってる。  
+BI is "Beatrobo Inc" prefix.  
+
 NSURLConnection + NSOperationQueue の JSON 取得 & パーサー。Blocks ベース。  
   
 Beatrobo で使ってたものを Beatplug に移植して更に PlugAir に移植したものを、更に抽象化して抽出したやつ。  
