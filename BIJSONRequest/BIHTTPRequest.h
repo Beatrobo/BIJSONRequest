@@ -14,14 +14,16 @@ typedef void (^BIHTTPRequestCallback)(NSHTTPURLResponse* httpUrlResponse, NSData
 
 @interface BIHTTPRequest : NSObject
 
-@property (nonatomic, copy, readonly) NSURL*              URL;
-@property (nonatomic, readonly)       BIHTTPRequestMethod method;
-@property (nonatomic, copy, readonly) NSDictionary*       query;
-@property (nonatomic, copy, readonly) NSDictionary*       form;
-@property (nonatomic, copy, readonly) NSURLRequest*       URLRequest;
+@property (nonatomic, copy, readonly) NSURL*               URL;
+@property (nonatomic, readonly)       BIHTTPRequestMethod  method;
+@property (nonatomic, copy, readonly) NSDictionary*        query;
+@property (nonatomic, copy, readonly) NSDictionary*        form;
+@property (nonatomic, readonly)       NSMutableURLRequest* URLRequest;
 - (instancetype)initWithURLString:(NSString*)URLString method:(BIHTTPRequestMethod)method query:(NSDictionary*)query form:(NSDictionary*)form;
 
-@property (nonatomic, readwrite) BOOL feedbackNetworkActivityIndicator; // Default is YES. flag for networkActivityIndicator (only iOS)
+@property (nonatomic) BOOL feedbackNetworkActivityIndicator; // Default is YES. flag for networkActivityIndicator (only iOS)
+@property (nonatomic) NSTimeInterval waitAfterConnection;    // Default is 0
+@property (nonatomic) dispatch_queue_t callbackQueue;        // Defautl is main queue
 
 - (void)sendHTTPRequestWithCallback:(BIHTTPRequestCallback)callback;
 

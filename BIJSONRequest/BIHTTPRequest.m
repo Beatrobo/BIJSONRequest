@@ -23,6 +23,9 @@
         _form       = form.copy;
         _URL        = [[self class] URLWithURLString:URLString query:_query];
         _URLRequest = [[self class] URLRequestForURL:_URL method:_method form:_form];
+        
+        _callbackQueue = dispatch_get_main_queue();
+        _waitAfterConnection = 0;
         _feedbackNetworkActivityIndicator = YES;
     }
     return self;
@@ -75,14 +78,19 @@
                     connectionError = [NSError errorWithDomain:@"BIJSONRequest" code:-1 userInfo:@{NSLocalizedDescriptionKey: @"URLResponse is not HTTPResponse"}];
                 }
             }
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (self.feedbackNetworkActivityIndicator) {
-                    [BIReachability endNetworkConnection];
-                }
+            dispatch_async(_callbackQueue, ^{
+                dp_exec_block_on_main_thread(^{
+                    if (self.feedbackNetworkActivityIndicator) {
+                        [BIReachability endNetworkConnection];
+                    }
+                });
                 if (callback) {
                     callback(httpUrlResponse, data, connectionError);
                 }
             });
+            if (_waitAfterConnection) {
+                [NSThread sleepForTimeInterval:_waitAfterConnection];
+            }
         }];
     });
 }

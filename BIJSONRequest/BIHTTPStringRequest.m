@@ -9,12 +9,20 @@
 - (void)sendHTTPStringRequestWithCallback:(BIHTTPStringRequestCallback)callback
 {
     [self sendHTTPRequestWithCallback:^(NSHTTPURLResponse* httpUrlResponse, NSData* data, NSError* connectionError) {
-        CFStringEncoding cfencoding = CFStringConvertIANACharSetNameToEncoding((__bridge CFStringRef)[httpUrlResponse textEncodingName]);
-        NSStringEncoding encoding   = CFStringConvertEncodingToNSStringEncoding(cfencoding);
-        NSString*        httpBody   = [[NSString alloc] initWithData:data encoding:encoding];
-        BIJRLogTrace(@"\n httpUrlResponse: %@\n httpBody: %@\n connectionError: %@", httpUrlResponse, httpBody, connectionError);
-        if (callback) {
-            callback(httpUrlResponse, httpBody, connectionError);
+        if (connectionError || [httpUrlResponse isKindOfClass:[NSHTTPURLResponse class]] == NO) {
+            BIJRLogTrace(@"\n httpUrlResponse: %@\n httpBody: %@\n connectionError: %@", httpUrlResponse, nil, connectionError);
+            if (callback) {
+                callback(httpUrlResponse, nil, connectionError);
+            }
+        }
+        else {
+            CFStringEncoding cfencoding = CFStringConvertIANACharSetNameToEncoding((__bridge CFStringRef)[httpUrlResponse textEncodingName]);
+            NSStringEncoding encoding   = CFStringConvertEncodingToNSStringEncoding(cfencoding);
+            NSString*        httpBody   = [[NSString alloc] initWithData:data encoding:encoding];
+            BIJRLogTrace(@"\n httpUrlResponse: %@\n httpBody: %@\n connectionError: %@", httpUrlResponse, httpBody, connectionError);
+            if (callback) {
+                callback(httpUrlResponse, httpBody, connectionError);
+            }
         }
     }];
 }
