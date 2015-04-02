@@ -2,6 +2,7 @@ BIJSONRequest
 =================
 
 ### Dependency
+* `dp_exec_block_on_main_thread`
 * `BILogManager`
 * `BIReachability`
 

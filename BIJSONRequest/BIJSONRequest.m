@@ -1,6 +1,6 @@
 #import "BIJSONRequest.h"
 #import "BIReachability.h"
-#import "NSURLConnection+bi_sendAsynchronousRequestOnMainThread.h"
+#import "dp_exec_block_on_main_thread.h"
 #import "BIJSONRequestLog.h"
 #import "BINullRemoveUtil.h"
 
@@ -59,31 +59,32 @@
         return;
     }
     
-    dispatch_async(dispatch_get_main_queue(), ^{
+    dp_exec_block_on_main_thread(^{
         if (self.feedbackNetworkActivityIndicator) {
             [BIReachability beginNetworkConnection];
         }
+        [[[self class] requestQueue] addOperationWithBlock:^{
+            NSURLResponse* urlResponse     = nil;
+            NSError*       connectionError = nil;
+            NSData* data = [NSURLConnection sendSynchronousRequest:_urlRequest returningResponse:&urlResponse error:&connectionError];
+            NSHTTPURLResponse* httpUrlResponse = nil;
+            if ([urlResponse isKindOfClass:[NSHTTPURLResponse class]]) {
+                httpUrlResponse = (NSHTTPURLResponse*)urlResponse;
+            } else {
+                if (!connectionError) {
+                    connectionError = [NSError errorWithDomain:@"BIJSONRequest" code:-1 userInfo:@{NSLocalizedDescriptionKey: @"URLResponse is not HTTPResponse"}];
+                }
+            }
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (self.feedbackNetworkActivityIndicator) {
+                    [BIReachability endNetworkConnection];
+                }
+                if (callback) {
+                    callback(httpUrlResponse, data, connectionError);
+                }
+            });
+        }];
     });
-    [NSURLConnection bi_sendAsynchronousRequest:_urlRequest
-                                          queue:[[self class] requestQueue]
-                              completionHandler:^(NSURLResponse* urlResponse, NSData* data, NSError* connectionError) {
-                                  NSHTTPURLResponse* httpUrlResponse = nil;
-                                  if ([urlResponse isKindOfClass:[NSHTTPURLResponse class]]) {
-                                      httpUrlResponse = (NSHTTPURLResponse*)urlResponse;
-                                  } else {
-                                      if (!connectionError) {
-                                          connectionError = [NSError errorWithDomain:@"BIJSONRequest" code:-1 userInfo:@{NSLocalizedDescriptionKey: @"URLResponse is not HTTPResponse"}];
-                                      }
-                                  }
-                                  dispatch_async(dispatch_get_main_queue(), ^{
-                                      if (self.feedbackNetworkActivityIndicator) {
-                                          [BIReachability endNetworkConnection];
-                                      }
-                                      if (callback) {
-                                          callback(httpUrlResponse, data, connectionError);
-                                      }
-                                  });
-                              }];
 }
 
 - (void)sendHTTPRequestWithCallback:(BIHTTPRequestCallback)callback
