@@ -51,12 +51,13 @@
     // Check network connection
     if ([BIReachability isInternetConnectionAvailable] == NO) {
         BIJRLogError(@"failed: no internet connection, %@", self);
-        dispatch_async(dispatch_get_main_queue(), ^{
+        dispatch_async(_callbackQueue, ^{
             if (callback) {
                 NSHTTPURLResponse* httpUrlResponse;
-                id                 jsonObject;
-                NSError*           connectionError = [NSError errorWithDomain:@"BIJSONRequest" code:-1 userInfo:@{NSLocalizedDescriptionKey: @"No internet connection"}];
-                callback(httpUrlResponse, jsonObject, connectionError);
+                id                 data;
+                NSString*          errorDomain     = NSStringFromClass([self class]);
+                NSError*           connectionError = [NSError errorWithDomain:errorDomain code:-1 userInfo:@{NSLocalizedDescriptionKey: @"No internet connection"}];
+                callback(httpUrlResponse, data, connectionError);
             }
         });
         return;

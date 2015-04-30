@@ -16,8 +16,8 @@
             }
         }
         else {
-            CFStringEncoding cfencoding = CFStringConvertIANACharSetNameToEncoding((__bridge CFStringRef)[httpUrlResponse textEncodingName]);
-            NSStringEncoding encoding   = CFStringConvertEncodingToNSStringEncoding(cfencoding);
+            CFStringEncoding cfEncoding = CFStringConvertIANACharSetNameToEncoding((__bridge CFStringRef)[httpUrlResponse textEncodingName]);
+            NSStringEncoding encoding   = CFStringConvertEncodingToNSStringEncoding(cfEncoding);
             NSString*        httpBody   = [[NSString alloc] initWithData:data encoding:encoding];
             BIJRLogTrace(@"\n httpUrlResponse: %@\n httpBody: %@\n connectionError: %@", httpUrlResponse, httpBody, connectionError);
             if (callback) {
