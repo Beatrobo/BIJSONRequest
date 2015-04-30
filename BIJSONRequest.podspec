@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name                  = 'BIJSONRequest'
-  s.version               = '2.0'
+  s.version               = '2.0.1'
   s.summary               = 'NSURLConnection + NSOperationQueue + NSJSONSerialization + Block Based Callback'
   s.author                = { 'Yusuke SUGAMIYA' => 'yusuke.dnpp@gmail.com' }
   s.homepage              = 'https://github.com/Beatrobo/BIJSONRequest'
