@@ -1,5 +1,4 @@
 #import "BIJSONRequest.h"
-#import "BIJSONRequestLog.h"
 #import "BINullRemoveUtil.h"
 
 
@@ -16,7 +15,6 @@
             jsonObject = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
             jsonObject = [BINullRemoveUtil objectForRemoveNullObjects:jsonObject];
         }
-        BIJRLogTrace(@"\n httpUrlResponse: %@\n jsonObject: %@\n connectionError: %@\n jsonError: %@", httpUrlResponse, jsonObject, connectionError, jsonError);
         if (callback) {
             callback(httpUrlResponse, jsonObject, connectionError, jsonError);
         }

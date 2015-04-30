@@ -1,5 +1,4 @@
 #import "BIHTTPRequest.h"
-#import "BIJSONRequestLog.h"
 #import "BIReachability.h"
 #import "dp_exec_block_on_main_thread.h"
 
@@ -50,7 +49,6 @@
 {
     // Check network connection
     if ([BIReachability isInternetConnectionAvailable] == NO) {
-        BIJRLogError(@"failed: no internet connection, %@", self);
         dispatch_async(_callbackQueue, ^{
             if (callback) {
                 NSHTTPURLResponse* httpUrlResponse;
@@ -99,7 +97,6 @@
 - (void)sendHTTPRequestWithCallback:(BIHTTPRequestCallback)callback
 {
     [self sendURLRequestWithCallback:^(NSHTTPURLResponse* httpUrlResponse, NSData* data, NSError* connectionError) {
-        BIJRLogTrace(@"\n httpUrlResponse: %@\n body: %@\n connectionError: %@", httpUrlResponse, data, connectionError);
         if (callback) {
             callback(httpUrlResponse, data, connectionError);
         }
@@ -165,8 +162,6 @@
         [queryString appendString:@"&"];
     }
     [queryString deleteCharactersInRange:NSMakeRange(queryString.length - 1, 1)];
-    
-    BIJRLogDebug(@"queryString: %@", queryString);
     
     return queryString.copy;
 }
@@ -246,9 +241,7 @@
     }];
     
     [postString appendString:[NSString stringWithFormat:@"\r\n--%@--\r\n", stringBoundary]];
-    
-    BIJRLogDebug(@"params: %@", postString);
-    
+        
     request.HTTPBody = [postString dataUsingEncoding:NSUTF8StringEncoding];
 }
 
