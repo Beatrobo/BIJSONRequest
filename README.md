@@ -1,7 +1,7 @@
 BIJSONRequest
 =================
 
-[![Build Status](http://img.shields.io/travis/Beatrobo/BIJSONRequest/development.svg?style=flat-square)](https://travis-ci.org/Beatrobo/BIJSONRequest)
+[![Build Status](http://img.shields.io/travis/Beatrobo/BIJSONRequest.svg?style=flat-square)](https://travis-ci.org/Beatrobo/BIJSONRequest)
 [![Pod Version](http://img.shields.io/cocoapods/v/BIJSONRequest.svg?style=flat-square)](http://cocoadocs.org/docsets/BIJSONRequest/)
 [![Pod Platform](http://img.shields.io/cocoapods/p/BIJSONRequest.svg?style=flat-square)](http://cocoadocs.org/docsets/BIJSONRequest/)
 [![Pod License](http://img.shields.io/cocoapods/l/BIJSONRequest.svg?style=flat-square)](http://opensource.org/licenses/MIT)
