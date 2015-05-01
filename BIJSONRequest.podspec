@@ -13,7 +13,6 @@ Pod::Spec.new do |s|
   s.osx.deployment_target = '10.8'
   s.requires_arc          = true
 
-  s.dependency 'dp_exec_block_on_main_thread'
   s.dependency 'BIReachability'
 
   s.license = {

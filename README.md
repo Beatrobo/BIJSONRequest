@@ -7,7 +7,6 @@ BIJSONRequest
 [![Pod License](http://img.shields.io/cocoapods/l/BIJSONRequest.svg?style=flat-square)](http://opensource.org/licenses/MIT)
 
 ### Dependency
-* `dp_exec_block_on_main_thread`
 * `BIReachability`
 
 ### Require Framework

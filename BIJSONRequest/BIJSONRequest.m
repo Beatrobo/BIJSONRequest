@@ -21,17 +21,4 @@
     }];
 }
 
-#pragma mark - Private Class Method
-
-+ (NSOperationQueue*)requestQueue
-{
-    static NSOperationQueue* requestQueue = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        requestQueue = [[NSOperationQueue alloc] init];
-        requestQueue.maxConcurrentOperationCount = 1;
-    });
-    return requestQueue;
-}
-
 @end

@@ -1,6 +1,5 @@
 #import "BIHTTPRequest.h"
 #import "BIReachability.h"
-#import "dp_exec_block_on_main_thread.h"
 
 
 @implementation BIHTTPRequest
@@ -23,6 +22,7 @@
         _URL        = [[self class] URLWithURLString:URLString query:_query];
         _URLRequest = [[self class] URLRequestForURL:_URL method:_method form:_form];
         
+        _requestQueue  = [[self class] defaultRequestOperationQueue];
         _callbackQueue = dispatch_get_main_queue();
         _waitAfterConnection = 0;
         _feedbackNetworkActivityIndicator = YES;
@@ -61,37 +61,33 @@
         return;
     }
     
-    dp_exec_block_on_main_thread(^{
-        if (self.feedbackNetworkActivityIndicator) {
-            [BIReachability beginNetworkConnection];
+    if (self.feedbackNetworkActivityIndicator) {
+        [BIReachability beginNetworkConnection];
+    }
+    [_requestQueue addOperationWithBlock:^{
+        NSURLResponse* urlResponse     = nil;
+        NSError*       connectionError = nil;
+        NSData* data = [NSURLConnection sendSynchronousRequest:_URLRequest returningResponse:&urlResponse error:&connectionError];
+        NSHTTPURLResponse* httpUrlResponse = nil;
+        if ([urlResponse isKindOfClass:[NSHTTPURLResponse class]]) {
+            httpUrlResponse = (NSHTTPURLResponse*)urlResponse;
+        } else {
+            if (!connectionError) {
+                connectionError = [NSError errorWithDomain:@"BIJSONRequest" code:-1 userInfo:@{NSLocalizedDescriptionKey: @"URLResponse is not HTTPResponse"}];
+            }
         }
-        [[[self class] requestQueue] addOperationWithBlock:^{
-            NSURLResponse* urlResponse     = nil;
-            NSError*       connectionError = nil;
-            NSData* data = [NSURLConnection sendSynchronousRequest:_URLRequest returningResponse:&urlResponse error:&connectionError];
-            NSHTTPURLResponse* httpUrlResponse = nil;
-            if ([urlResponse isKindOfClass:[NSHTTPURLResponse class]]) {
-                httpUrlResponse = (NSHTTPURLResponse*)urlResponse;
-            } else {
-                if (!connectionError) {
-                    connectionError = [NSError errorWithDomain:@"BIJSONRequest" code:-1 userInfo:@{NSLocalizedDescriptionKey: @"URLResponse is not HTTPResponse"}];
-                }
+        dispatch_async(_callbackQueue, ^{
+            if (self.feedbackNetworkActivityIndicator) {
+                [BIReachability endNetworkConnection];
             }
-            dispatch_async(_callbackQueue, ^{
-                dp_exec_block_on_main_thread(^{
-                    if (self.feedbackNetworkActivityIndicator) {
-                        [BIReachability endNetworkConnection];
-                    }
-                });
-                if (callback) {
-                    callback(httpUrlResponse, data, connectionError);
-                }
-            });
-            if (_waitAfterConnection) {
-                [NSThread sleepForTimeInterval:_waitAfterConnection];
+            if (callback) {
+                callback(httpUrlResponse, data, connectionError);
             }
-        }];
-    });
+        });
+        if (_waitAfterConnection) {
+            [NSThread sleepForTimeInterval:_waitAfterConnection];
+        }
+    }];
 }
 
 - (void)sendHTTPRequestWithCallback:(BIHTTPRequestCallback)callback
@@ -133,18 +129,18 @@
     return methodString;
 }
 
-#pragma mark - Private Class Method
-
-+ (NSOperationQueue*)requestQueue
++ (NSOperationQueue*)defaultRequestOperationQueue
 {
-    static NSOperationQueue* requestQueue = nil;
+    static NSOperationQueue* queue = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        requestQueue = [[NSOperationQueue alloc] init];
-        requestQueue.maxConcurrentOperationCount = 1;
+        queue = [[NSOperationQueue alloc] init];
+        queue.maxConcurrentOperationCount = 1;
     });
-    return requestQueue;
+    return queue;
 }
+
+#pragma mark - Private Class Method
 
 + (NSString*)queryStringFromQueryDictionary:(NSDictionary*)query
 {
