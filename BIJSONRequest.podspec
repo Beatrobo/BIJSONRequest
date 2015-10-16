@@ -1,9 +1,9 @@
 Pod::Spec.new do |s|
   s.name                  = 'BIJSONRequest'
-  s.version               = '2.0.2'
+  s.version               = '3.0.0'
   s.summary               = 'NSURLConnection + NSOperationQueue + NSJSONSerialization + Block Based Callback'
   s.author                = { 'Yusuke SUGAMIYA' => 'yusuke.dnpp@gmail.com' }
-  s.homepage              = 'https://github.com/Beatrobo/BIJSONRequest'
+  s.homepage              = 'https://github.com/dnpp73/DPJSONRequest'
   s.source                = { :git => 'https://github.com/Beatrobo/BIJSONRequest.git', :tag => "#{s.version}" }
   source_files            = 'BIJSONRequest/**/*.{h,m}'
   s.source_files          = source_files
@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.osx.deployment_target = '10.8'
   s.requires_arc          = true
 
-  s.dependency 'BIReachability'
+  s.dependency 'DPJSONRequest'
 
   s.license = {
    :type => 'MIT',

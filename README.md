@@ -6,19 +6,11 @@ BIJSONRequest
 [![Pod Platform](http://img.shields.io/cocoapods/p/BIJSONRequest.svg?style=flat-square)](http://cocoadocs.org/docsets/BIJSONRequest/)
 [![Pod License](http://img.shields.io/cocoapods/l/BIJSONRequest.svg?style=flat-square)](http://opensource.org/licenses/MIT)
 
-### Dependency
-* `BIReachability`
-
-### Require Framework
-* None  
-
 # Description
 
-BI is "Beatrobo Inc" prefix.
+This repository has been move to [`DPJSONRequest`](https://github.com/dnpp73/DPJSONRequest)
 
-NSURLConnection + NSOperationQueue + NSJSONSerialization + Block Based Callback
-
-#LICENSE
+# LICENSE
 
 Copyright (c) 2015 Beatrobo, Inc
 
